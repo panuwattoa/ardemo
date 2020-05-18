@@ -41,7 +41,7 @@ namespace JoystickLab
                 {
                     GameObject point = Instantiate(pointObject, hit.point, Quaternion.identity);
                     point.transform.localScale = new Vector3(pointsize, pointsize, pointsize);
-                    lineRenderDrawing.GetComponent<LineRendererDrawing>().DrawLine(point, true);
+                    lineRenderDrawing.GetComponent<LineRendererDrawing>().DrawLine(point, true,point);
                 }
             }
 
@@ -65,7 +65,7 @@ namespace JoystickLab
                     Vector3 targetPos = hit.point;
                     //targetPos.y += 1;
                     markerPoint.transform.position = targetPos;
-                    lineRenderDrawing.GetComponent<LineRendererDrawing>().DrawLine(markerPoint, false);  
+                    lineRenderDrawing.GetComponent<LineRendererDrawing>().DrawLine(markerPoint, false, pointObject);  
                 }
             }
         

@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -14,6 +16,8 @@ public class CaptureScreenshot : MonoBehaviour
     private string imageName;
 #pragma warning restore CS0649
     private int cameraLayer = 28;
+    public GameObject[] uiList;
+
 
     // Use this for initialization
     public void Capture() {
@@ -30,6 +34,10 @@ public class CaptureScreenshot : MonoBehaviour
     private IEnumerator TakeScreenShot()
     {
         yield return new WaitForEndOfFrame();
+        foreach (var ui in uiList)
+        {
+            ui.SetActive(false);
+        }
         RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
         cameraCupture.targetTexture = rt;
         Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGBA32, false);
@@ -39,10 +47,17 @@ public class CaptureScreenshot : MonoBehaviour
         cameraCupture.targetTexture = null;
         RenderTexture.active = null; // JC: added to avoid errors
         Destroy(rt);
-        byte[] bytes = screenShot.EncodeToPNG();
-        string path = Path.Combine(Application.persistentDataPath, imageName + ".png") ;
-        System.IO.File.WriteAllBytes(path, bytes);
-        Uploader.UploadFile(imageName+ ".png");
+        // byte[] bytes = screenShot.EncodeToPNG();
+        var fileName = Time.time;
+        // string path = Path.Combine(Application.persistentDataPath, imageName + ".png") ;
+        NativeGallery.SaveImageToGallery(screenShot, "SCG", fileName + ".png");
+        // System.IO.File.WriteAllBytes(path, bytes);
+        Destroy( screenShot );
+        foreach (var ui in uiList)
+        {
+            ui.SetActive(true);
+        }
+        Uploader.UploadFile(fileName + ".png");
     }
 
 }

@@ -8,17 +8,20 @@ using UnityEngine.UI.Extensions;
 public class ProcessMesh : MonoBehaviour
 {
    private Mesh m_mesh;
+   private MeshRenderer m_renderer;
    private Vector3[] m_vertices;
    private Vector2[] m_tringles;
    private int[] indices;
+   private float scale = 2;
    private void Awake()
    {
       m_mesh = GetComponent<MeshFilter>().mesh;
+      m_renderer = GetComponent<MeshRenderer>();
    }
 
    private void Update()
    {
-      if (LineRendererDrawing.Instance.pointStack.Count >= 3)
+      if (LineRendererDrawing.Instance.pointStack.Count >= 2)
       {
          MakeMeshData();
          CreateMesh();
@@ -58,5 +61,17 @@ public class ProcessMesh : MonoBehaviour
       m_mesh.RecalculateNormals();
       m_mesh.RecalculateBounds();
 
+   }
+
+   public void ScaleSize()
+   {
+      scale = scale * 0.5f + 1;
+      m_renderer.material.SetTextureScale("ThreeMat",new Vector2(scale, scale));
+   }
+   public void ScaleSizeDown()
+   {
+       scale = scale * 0.5f - 1;
+      // float scaleY = scale * 0.5f - 1;
+      m_renderer.material.SetTextureScale("ThreeMat",new Vector2(scale, scale));
    }
 }

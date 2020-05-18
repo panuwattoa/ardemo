@@ -61,11 +61,15 @@ public class PlaceObjectsOnPlane : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
-                if(IsPointerOverUIObject(touch)) return;
-                // If we have touched on top of a UI element, then we just return
-                GameObject point = Instantiate(dotPoint, placementPose.position, Quaternion.identity);
-                LineRendererDrawing.Instance.DrawLine(point,true);
-                onPlacedObject?.Invoke();
+
+                    if (IsPointerOverUIObject(touch)) return;
+                    TrackableType flags = TrackableType.PlaneWithinBounds | TrackableType.PlaneWithinPolygon;
+
+                    if (!m_RaycastManager.Raycast(Input.GetTouch(0).position, s_Hits, flags)) return;
+                    // If we have touched on top of a UI element, then we just return
+                    GameObject point = Instantiate(dotPoint, placementPose.position, Quaternion.identity);
+                    LineRendererDrawing.Instance.DrawLine(point, true, point);
+                    onPlacedObject?.Invoke();
             }
         }
     }
@@ -83,7 +87,7 @@ public class PlaceObjectsOnPlane : MonoBehaviour
             //But might come handy when we do some animation like "Apple Measure" app
             GameObject markerPointObj = markerPoint.transform.GetChild(0).gameObject;               
             // The passed argument is false, because we touch here. That means it just temporary dotted line.
-            LineRendererDrawing.Instance.DrawLine(markerPointObj,false);
+            LineRendererDrawing.Instance.DrawLine(markerPointObj,false, dotPoint);
         }
     }
 
