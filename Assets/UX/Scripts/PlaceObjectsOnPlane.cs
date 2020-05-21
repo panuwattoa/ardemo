@@ -59,18 +59,19 @@ public class PlaceObjectsOnPlane : MonoBehaviour
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
-
-            if (touch.phase == TouchPhase.Began)
+            if (Input.touchCount == 1)
             {
-
+                if (touch.phase == TouchPhase.Began)
+                {
                     if (IsPointerOverUIObject(touch)) return;
-                    TrackableType flags = TrackableType.PlaneWithinBounds | TrackableType.PlaneWithinPolygon;
-
-                    if (!m_RaycastManager.Raycast(Input.GetTouch(0).position, s_Hits, flags)) return;
+                    // TrackableType flags = TrackableType.PlaneWithinBounds | TrackableType.PlaneWithinPolygon;
+                    //
+                    // if (!m_RaycastManager.Raycast(Input.GetTouch(0).position, s_Hits, flags)) return;
                     // If we have touched on top of a UI element, then we just return
                     GameObject point = Instantiate(dotPoint, placementPose.position, Quaternion.identity);
                     LineRendererDrawing.Instance.DrawLine(point, true, point);
                     onPlacedObject?.Invoke();
+                }
             }
         }
     }
@@ -83,7 +84,7 @@ public class PlaceObjectsOnPlane : MonoBehaviour
         {
             Pose hitPose = s_Hits[0].pose;
             markerPoint.transform.position = hitPose.position;
-            placementPose = s_Hits[0].pose;
+            placementPose = hitPose;
             markerPoint.transform.GetChild(0).position = markerPoint.transform.position;
 
             //Taking the center point object of the marker point. This is not important in this moment.

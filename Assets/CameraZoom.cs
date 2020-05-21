@@ -21,6 +21,7 @@ public class CameraZoom : MonoBehaviour
     // Use this for initialization
     void OnEnable () {
         m_mainCamera = Camera.main;
+        CalculateCentroid();
     }
 	   
     // Update is called once per frame
@@ -95,5 +96,17 @@ public class CameraZoom : MonoBehaviour
         return mousePos.GetPoint(distance);
     }
 
+    private void CalculateCentroid()
+    {
+        Vector3 centroid = Vector3.zero;
+        var go = GameObject.FindWithTag("lineRender");
+        foreach (Transform child  in go.transform)
+        {
+            centroid += child.position;
+        }
+
+        centroid /= (go.transform.childCount + 1);
+        m_mainCamera.transform.position = centroid;
+    }
 
 }

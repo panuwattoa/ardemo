@@ -6,14 +6,23 @@ using UnityEngine.SceneManagement;
 
 namespace JoystickLab
 {
+    public enum pointType
+    {
+        Wall = 0,
+        Door
+    }
     public struct LineProp
     {
         public GameObject point;
         public GameObject distanceText;
-        public LineProp(GameObject point, GameObject distanceText)
+        public Vector3 position;
+        public pointType PointType;
+        public LineProp(GameObject point, GameObject distanceText,Vector3 position,pointType pointType)
         {
             this.point = point;
             this.distanceText = distanceText;
+            this.position = position;
+            PointType = pointType;
         }
         
         public void SetEnable(bool enabled)
@@ -29,16 +38,17 @@ namespace JoystickLab
     public class LineRendererDrawing : SingleToneManager<LineRendererDrawing>
     {
         public Material lineMaterial;
+        public Material DoorMaterial;
         public Material dottedLineMaterial;
         public GameObject cameraCapture;
         //public TextMesh distanceText;
         public GameObject distanceTextButton;
         public GameObject distanceText2DButton;
-
         public UnitConverter distanceUIBox;
         public GameObject exportObject;
         private List<Transform> clickPoints;
         private List<Transform> click2DPoints;
+        private List<Transform> pointPosition;
         private List<Vector3> clickPositions;
         public float lineWidth;
 
@@ -47,6 +57,7 @@ namespace JoystickLab
 
         public Stack<LineProp> pointStack;
         public Stack<LineProp> point2DStack;
+        public Stack<LineProp> door2dpoint;
         public Stack<float> lineDistance;
 
         private bool isDisCrete;
@@ -54,6 +65,7 @@ namespace JoystickLab
         private bool IsDisCreteFromSnap;
         private Vector3 coppyPosition;
         private GameObject originalPoint;
+        private bool m_isDrawDoor;
         public bool IsDisCrete
         {
             private get { return isDisCrete; }
@@ -73,6 +85,7 @@ namespace JoystickLab
             pointStack = new Stack<LineProp>();
             point2DStack = new Stack<LineProp>();
             lineDistance = new Stack<float>();
+            pointPosition = new List<Transform>();
             textObj = Instantiate(distanceTextButton.gameObject, Vector3.zero, Quaternion.identity);
             textObj.name = "DottedDistanceLabel";
             textObj.SetActive(false);
@@ -95,10 +108,8 @@ namespace JoystickLab
                 // check snap dot and close area
                 if (0 != lastIndex)
                 {
-                    Debug.Log("Distance " + Vector3.Distance(clickPoints[0].position, point.transform.position));
                     if (Vector3.Distance(clickPoints[0].position,point.transform.position) <= 0.05)
                     {
-                        Debug.Log("Snap dot");
                         coppyPosition = point.transform.position;
                         originalPoint = point;
                         point.transform.position = clickPoints[0].position;
@@ -115,27 +126,29 @@ namespace JoystickLab
             {
                 var position = point.transform.position;
                 var positionDraw2d = new Vector2(position.x, position.z);
-                CreateLine2D(positionDraw2d);
+                CreateLine2D(positionDraw2d,point.transform);
 
                 if (IsDisCreteFromSnap)
                 {
-                    point = Instantiate(dotPoint, coppyPosition, Quaternion.identity);
+                    point = Instantiate(dotPoint, point.transform.position, Quaternion.identity);
                 }
                 //Debug.Log("Straight");
                 clickPoints.Add(point.transform);
-                pointStack.Push(new LineProp(point, textObj));
+                var type = m_isDrawDoor ? pointType.Door : pointType.Wall;
+                pointStack.Push(new LineProp(point, textObj,point.transform.position,type));
                 // point.transform.SetParent(exportObject.transform);
                 point.transform.name = clickPoints.Count.ToString();
                 lastIndex = clickPoints.Count - 1;
-                // if (lineRenderer != null)
-                // {
-                //     lineRenderer.material = lineMaterial;
-                // }
+                if (lineRenderer != null)
+                {
+                    lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
+                }
                 if (point.GetComponent<LineRenderer>() == null)
                 {
                     lineRenderer = point.AddComponent<LineRenderer>();
                 }
-                lineRenderer.material = lineMaterial;
+                lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
+                // lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
                 lineRenderer.startWidth = lineRenderer.endWidth = lineWidth;
 
                 if (clickPoints.Count >= 2)
@@ -211,6 +224,7 @@ namespace JoystickLab
         {
             clickPoints.Clear();
             click2DPoints.Clear();
+            pointPosition.Clear();
         }
 
         public void Undo()
@@ -218,7 +232,6 @@ namespace JoystickLab
             if (pointStack.Count > 0)
             {
                 pointStack.Pop().SetEnable(false);
-                lineDistance.Pop();
                 textObj.SetActive(false);
             }
 
@@ -267,7 +280,7 @@ namespace JoystickLab
             // distanceUIBox.gameObject.SetActive(false);
         }
 
-        private void CreateLine2D(Vector2 position)
+        private void CreateLine2D(Vector2 position,Transform pointVector3)
         {
             Transform startpoint = null;
             Transform endPoint = null;
@@ -281,10 +294,12 @@ namespace JoystickLab
             {
                 lineRenderer2D = point.AddComponent<LineRenderer>();
             }
-            lineRenderer2D.material = lineMaterial;
+
+            lineRenderer2D.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
             lineRenderer2D.textureMode = LineTextureMode.Tile;
             lineRenderer2D.startWidth = lineRenderer2D.endWidth = lineWidth;
             click2DPoints.Add(point.transform);
+            pointPosition.Add(pointVector3);
             int lastIndex = click2DPoints.Count - 1;
 
             if (click2DPoints.Count >= 2)
@@ -292,33 +307,35 @@ namespace JoystickLab
                 lineRenderer2D.positionCount = 2;
                 lineRenderer2D.SetPosition(0, click2DPoints[lastIndex - 1].position);
                 lineRenderer2D.SetPosition(1, point.transform.position);
-                startpoint = click2DPoints[lastIndex - 1];
-                endPoint = point.transform;
+                startpoint = pointVector3;
+                endPoint = pointPosition[lastIndex - 1];
                 if (startpoint != null && endPoint != null)
                 {
                     var position1 = startpoint.position;
                     var position2 = endPoint.position;
                     Vector3 resultant = position2 - position1;
                     var distance = Vector3.Magnitude(resultant);
-                    DrawLength2D(position1, position2, distance);
+                    DrawLength2D(point.transform.position, click2DPoints[lastIndex - 1].position, distance);
                 }
             }
 
             // create point 2D 
-            point2DStack.Push(new LineProp(point,textObj));
+            var type = m_isDrawDoor ? pointType.Door : pointType.Wall;
+            point2DStack.Push(new LineProp(point,textObj,pointVector3.position,type));
         }
 
-        public void OnClearAllData()
+        public void OnClickDrawDoor()
         {
-            point2DStack.Clear();
-            click2DPoints.Clear();
-            pointStack.Clear();
-            clickPoints.Clear();
+            ClearPoints();
+            m_isDrawDoor = true;
+            IsDisCrete = true;
+        }
 
-            textObj = Instantiate(distanceTextButton.gameObject, Vector3.zero, Quaternion.identity);
-            textObj.name = "DottedDistanceLabel";
-            textObj.SetActive(false);
-            SceneManager.LoadScene("UXManagerScene");
+        public void OnClickDrawPlan()
+        {
+            ClearPoints();
+            m_isDrawDoor = false;
+            IsDisCrete = false;
         }
         
         void DrawLength2D(Vector2 pointOne, Vector2 pointTwo, float distance)
@@ -326,8 +343,8 @@ namespace JoystickLab
             string unit;
             Vector2 point = (pointOne + pointTwo) / 2;
             Debug.Log("Point x "+point.x + " point y "  + point.y);
-            // point.y += 0.02f;
-            point.x += 0.06f;
+            point.y += 0.06f;
+            point.x += 0.04f;
             var textObj2D = Instantiate(distanceText2DButton.gameObject, point, Quaternion.identity);
             textObj2D.transform.SetParent(exportObject.transform);
             if (point2DStack.Count > 0)
@@ -339,6 +356,8 @@ namespace JoystickLab
             // textObj.transform.SetParent(lineRenderer.transform);
             var finalOutputText = ProcessDistance(distance, out unit);
             textObj2D.GetComponentInChildren<TextMeshProUGUI>().text = finalOutputText + " <size=2>" + unit;
+            var color = m_isDrawDoor ? new Color(81, 81, 255, 255) : Color.white;
+            textObj2D.GetComponentInChildren<TextMeshProUGUI>().color = color;
         }
     }
 }
