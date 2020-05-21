@@ -138,14 +138,7 @@ public class UIManager : MonoBehaviour
         get => m_FaceManager;
         set => m_FaceManager = value;
     }
-
-    [SerializeField]
-    ARHumanBodyManager m_BodyManager;
-    public ARHumanBodyManager bodyManager
-    {
-        get => m_BodyManager;
-        set => m_BodyManager = value;
-    }
+    
 
     [SerializeField]
     ARTrackedImageManager m_ImageManager;
@@ -155,14 +148,14 @@ public class UIManager : MonoBehaviour
         set => m_ImageManager = value;
     }
 
-    [SerializeField]
-    ARTrackedObjectManager m_ObjectManager;
-
-    public ARTrackedObjectManager objectManager
-    {
-        get => m_ObjectManager;
-        set => m_ObjectManager = value;
-    }
+    // [SerializeField]
+    // ARTrackedObjectManager m_ObjectManager;
+    //
+    // public ARTrackedObjectManager objectManager
+    // {
+    //     get => m_ObjectManager;
+    //     set => m_ObjectManager = value;
+    // }
 
     [SerializeField]
     ARUXAnimationManager m_AnimationManager;
@@ -239,14 +232,9 @@ public class UIManager : MonoBehaviour
             if (m_ARSessionOrigin.GetComponent<ARFaceManager>())
                 m_FaceManager = m_ARSessionOrigin.GetComponent<ARFaceManager>();
 
-            if (m_ARSessionOrigin.GetComponent<ARHumanBodyManager>())
-                m_BodyManager = m_ARSessionOrigin.GetComponent<ARHumanBodyManager>();
-
             if (m_ARSessionOrigin.GetComponent<ARTrackedImageManager>())
                 m_ImageManager = m_ARSessionOrigin.GetComponent<ARTrackedImageManager>();
 
-            if (m_ARSessionOrigin.GetComponent<ARTrackedObjectManager>())
-                m_ObjectManager = m_ARSessionOrigin.GetComponent<ARTrackedObjectManager>();
         }
     }
     
@@ -347,7 +335,9 @@ public class UIManager : MonoBehaviour
 
     bool BodyFound()
     {
-        return m_BodyManager?.trackables.count > 0;
+        // return m_BodyManager?.trackables.count > 0;
+        return false;
+
     }
 
     bool ImageFound()
@@ -357,7 +347,8 @@ public class UIManager : MonoBehaviour
 
     bool ObjectFound()
     {
-        return m_ObjectManager?.trackables.count > 0;
+        // return m_ObjectManager?.trackables.count > 0;
+        return false;
     }
 
     void FadeComplete()

@@ -308,8 +308,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 4.58, y: -22.16}
+  m_SizeDelta: {x: 206.96231, y: 321.56482}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &73861490
 GameObject:
@@ -578,7 +578,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -924,7 +924,7 @@ MonoBehaviour:
   cameraCapture: {fileID: 1420504253}
   distanceTextButton: {fileID: 4037827840202877991, guid: dcb015fbf78404f09a84ce299a3a5974,
     type: 3}
-  distanceText2DButton: {fileID: 4037827840202877991, guid: dcb015fbf78404f09a84ce299a3a5974,
+  distanceText2DButton: {fileID: 4037827840202877991, guid: 443a3973a1df54f7f96668cb118cb89c,
     type: 3}
   distanceUIBox: {fileID: 0}
   exportObject: {fileID: 63255109}
@@ -1049,7 +1049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_CameraManager: {fileID: 282840816}
-  m_BrightnessMod: 2
+  m_Arrow: {fileID: 0}
 --- !u!1 &1303121143
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,7 +1208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PlanePrefab: {fileID: 4776765576899091622, guid: 635f0c5c56e955042b05a01c20415c3b,
     type: 3}
-  m_DetectionMode: -1
+  m_DetectionMode: 1
 --- !u!114 &1335839538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1316,7 +1316,7 @@ MonoBehaviour:
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_DisabledColor: {r: 1, g: 1, b: 1, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:

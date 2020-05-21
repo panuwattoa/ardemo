@@ -43,6 +43,7 @@ public class PlaceObjectsOnPlane : MonoBehaviour
 
     void Awake()
     {
+        Application.targetFrameRate = 60;
         m_RaycastManager = GetComponent<ARRaycastManager>();
     }
     
@@ -83,6 +84,8 @@ public class PlaceObjectsOnPlane : MonoBehaviour
             Pose hitPose = s_Hits[0].pose;
             markerPoint.transform.position = hitPose.position;
             placementPose = s_Hits[0].pose;
+            markerPoint.transform.GetChild(0).position = markerPoint.transform.position;
+
             //Taking the center point object of the marker point. This is not important in this moment.
             //But might come handy when we do some animation like "Apple Measure" app
             GameObject markerPointObj = markerPoint.transform.GetChild(0).gameObject;               

@@ -50,9 +50,10 @@ namespace JoystickLab
         public Stack<float> lineDistance;
 
         private bool isDisCrete;
-
+        private bool isFromSanp;
         private bool IsDisCreteFromSnap;
-        
+        private Vector3 coppyPosition;
+        private GameObject originalPoint;
         public bool IsDisCrete
         {
             private get { return isDisCrete; }
@@ -83,40 +84,45 @@ namespace JoystickLab
             int lastIndex = clickPoints.Count - 1;
             Transform startpoint = null;
             Transform endPoint = null;
-
+            isFromSanp = false;
             if (!done && clickPoints.Count > 0)
             {
                 lineRenderer.material = dottedLineMaterial;
                 lineRenderer.textureMode = LineTextureMode.Tile;
                 lineRenderer.positionCount = 2;
-                lineRenderer.SetPosition(0, clickPoints[lastIndex].position);
-                lineRenderer.SetPosition(1, point.transform.position);
                 startpoint = clickPoints[lastIndex];
                 
                 // check snap dot and close area
                 if (0 != lastIndex)
                 {
                     Debug.Log("Distance " + Vector3.Distance(clickPoints[0].position, point.transform.position));
-                    if (Vector3.Distance(clickPoints[0].position,point.transform.position) <= 0.03)
+                    if (Vector3.Distance(clickPoints[0].position,point.transform.position) <= 0.05)
                     {
                         Debug.Log("Snap dot");
-                        // var copyPosition = clickPoints[0].position;
-                        // point.transform.position = clickPoints[0].position;
-                        point = Instantiate(dotPoint, clickPoints[0].position, Quaternion.identity);
+                        coppyPosition = point.transform.position;
+                        originalPoint = point;
+                        point.transform.position = clickPoints[0].position;
                         IsDisCreteFromSnap = true;
                         done = true;
                     }
                 }
+                lineRenderer.SetPosition(0, clickPoints[lastIndex].position);
+                lineRenderer.SetPosition(1, point.transform.position);
                 endPoint = point.transform;
             }
 
             if (done) // done == true when user click
             {
+                var position = point.transform.position;
+                var positionDraw2d = new Vector2(position.x, position.z);
+                CreateLine2D(positionDraw2d);
+
+                if (IsDisCreteFromSnap)
+                {
+                    point = Instantiate(dotPoint, coppyPosition, Quaternion.identity);
+                }
                 //Debug.Log("Straight");
                 clickPoints.Add(point.transform);
-                var position1 = point.transform.position;
-                var position = new Vector2(position1.x, position1.z);
-                CreateLine2D(position);
                 pointStack.Push(new LineProp(point, textObj));
                 // point.transform.SetParent(exportObject.transform);
                 point.transform.name = clickPoints.Count.ToString();
@@ -131,9 +137,7 @@ namespace JoystickLab
                 }
                 lineRenderer.material = lineMaterial;
                 lineRenderer.startWidth = lineRenderer.endWidth = lineWidth;
-                
-                
-                
+
                 if (clickPoints.Count >= 2)
                 {
                     startpoint = clickPoints[lastIndex];
@@ -177,7 +181,6 @@ namespace JoystickLab
                     LineProp l = pointStack.Pop();
                     l.distanceText = textObj;
                     pointStack.Push(l);
-                    lineDistance.Push(distance);
                 }
             }      
             else if (!done)
@@ -269,6 +272,7 @@ namespace JoystickLab
             Transform startpoint = null;
             Transform endPoint = null;
             GameObject point = new GameObject();
+            // point.transform.position = new Vector2(position.x,position.z);
             point.transform.position = position;
             point.transform.name = click2DPoints.Count.ToString();
             point.transform.SetParent(exportObject.transform);
@@ -290,9 +294,13 @@ namespace JoystickLab
                 lineRenderer2D.SetPosition(1, point.transform.position);
                 startpoint = click2DPoints[lastIndex - 1];
                 endPoint = point.transform;
-                if (lineDistance.Count > 0)
+                if (startpoint != null && endPoint != null)
                 {
-                    DrawLength2D(startpoint.position, endPoint.position, lineDistance.Pop());
+                    var position1 = startpoint.position;
+                    var position2 = endPoint.position;
+                    Vector3 resultant = position2 - position1;
+                    var distance = Vector3.Magnitude(resultant);
+                    DrawLength2D(position1, position2, distance);
                 }
             }
 
@@ -319,8 +327,15 @@ namespace JoystickLab
             Vector2 point = (pointOne + pointTwo) / 2;
             Debug.Log("Point x "+point.x + " point y "  + point.y);
             // point.y += 0.02f;
+            point.x += 0.06f;
             var textObj2D = Instantiate(distanceText2DButton.gameObject, point, Quaternion.identity);
             textObj2D.transform.SetParent(exportObject.transform);
+            if (point2DStack.Count > 0)
+            {
+                LineProp l = point2DStack.Pop();
+                l.distanceText = textObj2D;
+                point2DStack.Push(l);
+            }
             // textObj.transform.SetParent(lineRenderer.transform);
             var finalOutputText = ProcessDistance(distance, out unit);
             textObj2D.GetComponentInChildren<TextMeshProUGUI>().text = finalOutputText + " <size=2>" + unit;
