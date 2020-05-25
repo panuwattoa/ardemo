@@ -159,6 +159,8 @@ namespace JoystickLab
                 {
                     lineRenderer = point.AddComponent<LineRenderer>();
                 }
+
+                lineRenderer.positionCount = 0;
                 lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
                 // lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
                 lineRenderer.startWidth = lineRenderer.endWidth = lineWidth;
@@ -171,7 +173,7 @@ namespace JoystickLab
                     {
                         ClearPoints();
                     }
-
+                
                     if (IsDisCreteFromSnap)
                     {
                         IsDisCreteFromSnap = false;
@@ -202,10 +204,10 @@ namespace JoystickLab
                 textObj = Instantiate(distanceTextButton.gameObject, point, Quaternion.identity);
                 textObj.name = clickPoints.Count + "th Label";
                 if (pointStack.Count > 0)
-                {
+                {               
                     LineProp l = pointStack.Pop();
-                    l.distanceText = textObj;
-                    pointStack.Push(l);
+                     l.distanceText = textObj;
+                     pointStack.Push(l);
                 }
             }      
             else if (!done)
@@ -302,9 +304,12 @@ namespace JoystickLab
             point.transform.name = click2DPoints.Count.ToString();
             point.transform.SetParent(exportObject.transform);
             LineRenderer lineRenderer2D = new LineRenderer {};
+            
             if (point.GetComponent<LineRenderer>() == null)
             {
-                lineRenderer2D = point.AddComponent<LineRenderer>();
+                 lineRenderer2D = point.AddComponent<LineRenderer>();
+                 point.SetActive(false);
+                 lineRenderer2D.positionCount = 0;
             }
 
             lineRenderer2D.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
@@ -316,7 +321,10 @@ namespace JoystickLab
 
             if (click2DPoints.Count >= 2)
             {
+                click2DPoints[lastIndex - 1].gameObject.SetActive(true);
+                point.SetActive(true);
                 lineRenderer2D.positionCount = 2;
+                lineRenderer2D.gameObject.tag = "Dot";
                 lineRenderer2D.SetPosition(0, click2DPoints[lastIndex - 1].position);
                 lineRenderer2D.SetPosition(1, point.transform.position);
                 startpoint = pointVector3;
@@ -340,7 +348,7 @@ namespace JoystickLab
         {
             ClearPoints();
             m_isDrawDoor = true;
-            IsDisCrete = true;
+            // IsDisCrete = true;
         }
 
         public void OnClickDrawPlan()

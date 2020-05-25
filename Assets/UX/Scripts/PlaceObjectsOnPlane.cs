@@ -64,13 +64,12 @@ public class PlaceObjectsOnPlane : MonoBehaviour
                 if (touch.phase == TouchPhase.Began)
                 {
                     if (IsPointerOverUIObject(touch)) return;
-                    // TrackableType flags = TrackableType.PlaneWithinBounds | TrackableType.PlaneWithinPolygon;
-                    //
-                    // if (!m_RaycastManager.Raycast(Input.GetTouch(0).position, s_Hits, flags)) return;
+                    TrackableType flags = TrackableType.PlaneWithinBounds | TrackableType.PlaneWithinPolygon;
+                   // if (!m_RaycastManager.Raycast(Input.GetTouch(0).position, s_Hits, flags)) return;
                     // If we have touched on top of a UI element, then we just return
                     GameObject point = Instantiate(dotPoint, placementPose.position, Quaternion.identity);
                     LineRendererDrawing.Instance.DrawLine(point, true, point);
-                    onPlacedObject?.Invoke();
+                    // onPlacedObject?.Invoke();
                 }
             }
         }
