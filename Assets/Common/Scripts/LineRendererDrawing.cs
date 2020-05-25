@@ -113,8 +113,8 @@ namespace JoystickLab
                         coppyPosition = point.transform.position;
                         originalPoint = point;
                         point.transform.position = clickPoints[0].position;
-                        IsDisCreteFromSnap = true;
-                        done = true;
+                        // IsDisCreteFromSnap = true;
+                        // done = true;
                     }
                 }
                 lineRenderer.SetPosition(0, clickPoints[lastIndex].position);
@@ -124,14 +124,26 @@ namespace JoystickLab
 
             if (done) // done == true when user click
             {
+                if (0 != lastIndex)
+                {
+                    if (clickPoints.Count >= 2)
+                    {
+                        if (Vector3.Distance(clickPoints[0].position,point.transform.position) <= 0.05)
+                        {
+                            point.transform.position = clickPoints[0].position;
+                            IsDisCreteFromSnap = true;
+                            // done = true;
+                        }
+                    }
+                }
                 var position = point.transform.position;
                 var positionDraw2d = new Vector2(position.x, position.z);
                 CreateLine2D(positionDraw2d,point.transform);
 
-                if (IsDisCreteFromSnap)
-                {
-                    point = Instantiate(dotPoint, point.transform.position, Quaternion.identity);
-                }
+                // if (IsDisCreteFromSnap)
+                // {
+                //     point = Instantiate(dotPoint, point.transform.position, Quaternion.identity);
+                // }
                 //Debug.Log("Straight");
                 clickPoints.Add(point.transform);
                 var type = m_isDrawDoor ? pointType.Door : pointType.Wall;

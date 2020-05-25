@@ -106,7 +106,7 @@ public class CameraZoom : MonoBehaviour
         }
 
         centroid /= (go.transform.childCount + 1);
-        m_mainCamera.transform.position = centroid;
+        m_mainCamera.transform.position = new Vector3(centroid.x,centroid.y,-10);
     }
 
 }
