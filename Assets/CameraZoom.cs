@@ -92,8 +92,8 @@ public class CameraZoom : MonoBehaviour
                             var zRotationValue = m_mainCamera.transform.rotation;
                             // ... or check the delta angle between them ...
                             turnAngle = Angle(firstTouch.position, secondTouch.position);
-                            float prevTurn = Angle(firstTouch.position - secondTouch.deltaPosition,
-                                firstTouch.position - secondTouch.deltaPosition);
+                            float prevTurn = Angle(firstTouch.position - firstTouch.deltaPosition,
+                                secondTouch.position - secondTouch.deltaPosition);
                             turnAngleDelta = Mathf.DeltaAngle(prevTurn, turnAngle);
 
                             // ... if it's greater than a minimum threshold, it's a turn!
@@ -106,13 +106,13 @@ public class CameraZoom : MonoBehaviour
                                 turnAngle = turnAngleDelta = 0;
                             }
 
-                            // if (Mathf.Abs(turnAngleDelta) > 0)
-                            // {
+                            if (Mathf.Abs(turnAngleDelta) > 0)
+                            {
                                 Vector3 rotationDeg = Vector3.zero;
-                                rotationDeg.z = turnAngleDelta / 15f;
+                                rotationDeg.z = -turnAngleDelta;
                                 zRotationValue *= Quaternion.Euler(rotationDeg);
                                 m_mainCamera.transform.rotation = zRotationValue;
-                            // }
+                            }
 
                         }
                         else
