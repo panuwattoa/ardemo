@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: 7285408087701223454}
   - component: {fileID: 1502726702225213778}
   - component: {fileID: 7118099465800316175}
+  - component: {fileID: 4375813166016642837}
   m_Layer: 5
   m_Name: DistanceObj2D
   m_TagString: Finish
@@ -256,6 +257,30 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4375813166016642837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4037827840202877991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b60eab6b00a564d9ca7336a3bd92895d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  - eventID: 3
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
+  rotationRate: 0.2
+  distanceButton: {fileID: 0}
+  speed: 0.1
 --- !u!1 &8393354154193949350
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,7 +365,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8393354154193949350}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -383,7 +408,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8393354154193949350}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d5d27cb27e414bbc851bbc7d21a136a, type: 3}
   m_Name: 

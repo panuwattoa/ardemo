@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraZoom : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class CameraZoom : MonoBehaviour
     float zoomModifierSpeed = 0.2f;
 
     [SerializeField] private TextMeshProUGUI textButtonMode;
+    [SerializeField] private GameObject editLabel;
     private float startTime;
     public float speed = 5F; 
     private  Vector3 direction;
@@ -24,6 +26,8 @@ public class CameraZoom : MonoBehaviour
     private float turnAngle;
     private float turnAngleDelta;
     private bool m_isRotationMode;
+
+    private bool m_isEditLabalModel;
     // Use this for initialization
     void OnEnable () {
         m_mainCamera = Camera.main;
@@ -33,7 +37,7 @@ public class CameraZoom : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (Input.touchCount > 0)
+        if (Input.touchCount > 0 && !m_isEditLabalModel)
         {
             switch (Input.touchCount)
             {
@@ -78,7 +82,6 @@ public class CameraZoom : MonoBehaviour
                     turnAngle = turnAngleDelta = 0;
                     if (firstTouch.phase == TouchPhase.Moved || secondTouch.phase == TouchPhase.Moved)
                     {
-
                         firstTouchPrevPos = firstTouch.position - firstTouch.deltaPosition;
                         secondTouchPrevPos = secondTouch.position - secondTouch.deltaPosition;
 
@@ -166,6 +169,21 @@ public class CameraZoom : MonoBehaviour
     {
         m_isRotationMode = !m_isRotationMode;
         textButtonMode.text = !m_isRotationMode ? "Rotation Mode" : "Zoom Mode";
+    }
+
+    public void OnClickEditLabelMode()
+    {
+        m_isEditLabalModel = !m_isEditLabalModel;
+        if (m_isEditLabalModel)
+        {
+            var image = editLabel.GetComponent<Image>();
+              image.color = Color.red;
+        }
+        else
+        {
+            var image = editLabel.GetComponent<Image>();
+            image.color = Color.white; 
+        }
     }
 
      private float Angle (Vector2 pos1, Vector2 pos2) {

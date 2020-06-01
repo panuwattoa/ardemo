@@ -3,13 +3,14 @@ using System.Diagnostics.Contracts;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace JoystickLab
 {
     public enum pointType
     {
         Wall = 0,
-        Door
+        VoidOut
     }
     public struct LineProp
     {
@@ -66,6 +67,8 @@ namespace JoystickLab
         private Vector3 coppyPosition;
         private GameObject originalPoint;
         private bool m_isDrawDoor;
+        private float dist = Mathf.Infinity;
+        
         public bool IsDisCrete
         {
             private get { return isDisCrete; }
@@ -91,6 +94,8 @@ namespace JoystickLab
             textObj.SetActive(false);
         }
         
+         
+        
         public float DrawLine(GameObject point, bool done,GameObject dotPoint)
         {
             float distance = 0;
@@ -105,18 +110,46 @@ namespace JoystickLab
                 lineRenderer.positionCount = 2;
                 startpoint = clickPoints[lastIndex];
                 
+                var lines = GameObject.FindGameObjectsWithTag("line");
+                foreach (var line in lines)
+                {
+                    // if (Vector3.Distance(new Vector3(0,0,line.transform.position.z),new Vector3(0,0,point.transform.position.z)) <= 0.05)
+                    // {
+                    //     point.transform.position = new Vector3(point.transform.position.x,point.transform.position.y,clickPoints[0].position.z);
+                    // }
+                    var partnerPos = Camera.main.WorldToViewportPoint(line.transform.position);
+                    var myPos = Camera.main.WorldToViewportPoint(transform.position);
+                    dist = Vector2.Distance(partnerPos, myPos);
+                    if (dist < 0.05)
+                    {
+                        point.transform.position = partnerPos;
+                    }
+                    
+                }
+                
                 // check snap dot and close area
                 if (0 != lastIndex)
                 {
                     if (Vector3.Distance(clickPoints[0].position,point.transform.position) <= 0.05)
                     {
-                        coppyPosition = point.transform.position;
-                        originalPoint = point;
                         point.transform.position = clickPoints[0].position;
                         // IsDisCreteFromSnap = true;
                         // done = true;
                     }
                 }
+
+
+
+                // var lineObject = GameObject.FindGameObjectsWithTag("line");
+                // foreach (var line in lineObject)
+                // {
+                //     if (Vector3.Distance(line.transform.position,point.transform.position) <= 0.05)
+                //     {
+                //         point.transform.position = line.transform.position;
+                //         break;
+                //     }
+                // }
+                
                 lineRenderer.SetPosition(0, clickPoints[lastIndex].position);
                 lineRenderer.SetPosition(1, point.transform.position);
                 endPoint = point.transform;
@@ -146,7 +179,7 @@ namespace JoystickLab
                 // }
                 //Debug.Log("Straight");
                 clickPoints.Add(point.transform);
-                var type = m_isDrawDoor ? pointType.Door : pointType.Wall;
+                var type = m_isDrawDoor ? pointType.VoidOut : pointType.Wall;
                 pointStack.Push(new LineProp(point, textObj,point.transform.position,type));
                 // point.transform.SetParent(exportObject.transform);
                 point.transform.name = clickPoints.Count.ToString();
@@ -164,6 +197,13 @@ namespace JoystickLab
                 lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
                 // lineRenderer.material = m_isDrawDoor ? DoorMaterial : lineMaterial;
                 lineRenderer.startWidth = lineRenderer.endWidth = lineWidth;
+                if (lineRenderer.gameObject.GetComponent<BoxCollider>() == null)
+                {
+                    GameObject o;
+                    (o = lineRenderer.gameObject).AddComponent<BoxCollider>().isTrigger = true;
+                    lineRenderer.gameObject.AddComponent<Rigidbody>().useGravity = false;
+                    o.tag = "line";
+                }
 
                 if (clickPoints.Count >= 2)
                 {
@@ -203,12 +243,24 @@ namespace JoystickLab
             {
                 textObj = Instantiate(distanceTextButton.gameObject, point, Quaternion.identity);
                 textObj.name = clickPoints.Count + "th Label";
+                if (m_isDrawDoor)
+                {
+                    if (textObj.GetComponentInChildren<Button>() != null)
+                    {
+                        var image = textObj.GetComponentInChildren<Button>().image;
+                        var colorImg = image.color;
+                        colorImg.a = 0.2f;
+                        image.color = colorImg;
+                        textObj.GetComponentInChildren<Button>().image = image;
+                    }
+                }
                 if (pointStack.Count > 0)
                 {               
                     LineProp l = pointStack.Pop();
                      l.distanceText = textObj;
                      pointStack.Push(l);
                 }
+
             }      
             else if (!done)
             {
@@ -226,8 +278,12 @@ namespace JoystickLab
             finalOutputText = ProcessDistance(distance, out unit);
             
             textObj.GetComponentInChildren<TextMeshProUGUI>().text = finalOutputText + " <size=2>" + unit;
-
-            Vector3 prevAngle = textObj.transform.eulerAngles;
+           Vector3 prevAngle = textObj.transform.eulerAngles;
+            Debug.Log("yAngle " + yAngle);
+            if (-yAngle >= 150 || yAngle >= 150)
+            {
+                yAngle = 0;
+            }
             prevAngle.y = -yAngle;
             prevAngle.x = 90;
             
@@ -258,13 +314,13 @@ namespace JoystickLab
 
         public string ProcessDistance(float distance, out string unit)
         {
-            float d = distance * 100;
-            unit = "cm";
-            if (d > 100)
-            {
-                d = distance;
+            // float d = distance * 100;
+            // unit = "cm";
+            // if (d > 100)
+            // {
+                float d = distance;
                 unit = "m";
-            }
+            // }
             return d.ToString("F1");
         }
 
@@ -273,7 +329,6 @@ namespace JoystickLab
             int leftarrowIndex = output.IndexOf('<');
             int rightarrawIndex = output.IndexOf('>');
             string ans = output.Substring(0,leftarrowIndex-1);
-            print("leng"+output.Length);
             string unit = output.Substring(rightarrawIndex+1, output.Length - rightarrawIndex-1);
             // distanceUIBox.output = ans+ " <size=80>" +unit;
             //
@@ -335,12 +390,14 @@ namespace JoystickLab
                     var position2 = endPoint.position;
                     Vector3 resultant = position2 - position1;
                     var distance = Vector3.Magnitude(resultant);
-                    DrawLength2D(point.transform.position, click2DPoints[lastIndex - 1].position, distance);
+                    var resultant2d = point.transform.position - click2DPoints[lastIndex - 1].position;
+                    float angel = Mathf.Atan2(resultant2d.y, resultant2d.x) * Mathf.Rad2Deg;
+                    DrawLength2D(point.transform.position, click2DPoints[lastIndex - 1].position, distance,angel);
                 }
             }
 
             // create point 2D 
-            var type = m_isDrawDoor ? pointType.Door : pointType.Wall;
+            var type = m_isDrawDoor ? pointType.VoidOut : pointType.Wall;
             point2DStack.Push(new LineProp(point,textObj,pointVector3.position,type));
         }
 
@@ -358,7 +415,7 @@ namespace JoystickLab
             IsDisCrete = false;
         }
         
-        void DrawLength2D(Vector2 pointOne, Vector2 pointTwo, float distance)
+        void DrawLength2D(Vector2 pointOne, Vector2 pointTwo, float distance,float yAngle)
         {
             string unit;
             Vector2 point = (pointOne + pointTwo) / 2;
@@ -367,6 +424,17 @@ namespace JoystickLab
             point.x += 0.04f;
             var textObj2D = Instantiate(distanceText2DButton.gameObject, point, Quaternion.identity);
             textObj2D.transform.SetParent(exportObject.transform);
+            if (m_isDrawDoor)
+            {
+                if (textObj2D.GetComponentInChildren<Button>() != null)
+                {
+                   var image = textObj2D.GetComponentInChildren<Button>().image;
+                    var colorImg = image.color;
+                    colorImg.a = 0.2f;
+                    image.color = colorImg;
+                    textObj2D.GetComponentInChildren<Button>().image = image;
+                }
+            }
             if (point2DStack.Count > 0)
             {
                 LineProp l = point2DStack.Pop();
@@ -378,6 +446,15 @@ namespace JoystickLab
             textObj2D.GetComponentInChildren<TextMeshProUGUI>().text = finalOutputText + " <size=2>" + unit;
             var color = m_isDrawDoor ? new Color(81, 81, 255, 255) : Color.white;
             textObj2D.GetComponentInChildren<TextMeshProUGUI>().color = color;
+            Vector3 prevAngle = textObj2D.transform.eulerAngles;
+            if (-yAngle >= 150 || yAngle >= 150)
+            {
+                yAngle = 0;
+            }
+            prevAngle.z = -yAngle;
+            prevAngle.y = 0;
+            prevAngle.x = 0;
+            textObj2D.transform.eulerAngles = prevAngle;
         }
     }
 }

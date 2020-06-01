@@ -271,6 +271,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db9bcf445dd8e4f59883ab4addb6d1ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rotationRate: 0.2
+  allowMove: 0
   distanceButton: {fileID: 865599582224941782}
 --- !u!65 &600517740173138025
 BoxCollider:
@@ -362,7 +364,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.49019608}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
