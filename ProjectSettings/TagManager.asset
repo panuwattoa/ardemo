@@ -8,6 +8,7 @@ TagManager:
   - point
   - Dot
   - line
+  - material
   layers:
   - Default
   - TransparentFX

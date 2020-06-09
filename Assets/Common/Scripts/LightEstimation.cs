@@ -135,39 +135,39 @@ public class LightEstimation : MonoBehaviour
             m_Light.color = colorCorrection.Value;
         }
 
-        // if (args.lightEstimation.mainLightDirection.HasValue)
-        // {
-        //     mainLightDirection = args.lightEstimation.mainLightDirection;
-        //     m_Light.transform.rotation = Quaternion.LookRotation(mainLightDirection.Value);
-        //     if (arrow)
-        //     {
-        //         arrow.gameObject.SetActive(true);
-        //         arrow.rotation = Quaternion.LookRotation(mainLightDirection.Value);
-        //     }
-        // }
-        // else
-        // {
-        //     arrow?.gameObject.SetActive(false);
-        // }
-        //
-        // if (args.lightEstimation.mainLightColor.HasValue)
-        // {
-        //     mainLightColor = args.lightEstimation.mainLightColor;
-        //     m_Light.color = mainLightColor.Value;
-        // }
-        //
-        // if (args.lightEstimation.mainLightIntensityLumens.HasValue)
-        // {
-        //     mainLightIntensityLumens = args.lightEstimation.mainLightIntensityLumens;
-        //     m_Light.intensity = args.lightEstimation.averageMainLightBrightness.Value;
-        // }
-        //
-        // if (args.lightEstimation.ambientSphericalHarmonics.HasValue)
-        // {
-        //     sphericalHarmonics = args.lightEstimation.ambientSphericalHarmonics;
-        //     RenderSettings.ambientMode = AmbientMode.Skybox;
-        //     RenderSettings.ambientProbe = sphericalHarmonics.Value;
-        // }
+         // if (args.lightEstimation.mainLightDirection.HasValue)
+         // {
+         //     mainLightDirection = args.lightEstimation.mainLightDirection;
+         //     m_Light.transform.rotation = Quaternion.LookRotation(mainLightDirection.Value);
+         //     if (arrow)
+         //     {
+         //         arrow.gameObject.SetActive(true);
+         //         arrow.rotation = Quaternion.LookRotation(mainLightDirection.Value);
+         //     }
+         // }
+         // else
+         // {
+         //     arrow?.gameObject.SetActive(false);
+         // }
+         //
+         // if (args.lightEstimation.mainLightColor.HasValue)
+         // {
+         //     mainLightColor = args.lightEstimation.mainLightColor;
+         //     m_Light.color = mainLightColor.Value;
+         // }
+         //
+         // if (args.lightEstimation.mainLightIntensityLumens.HasValue)
+         // {
+         //     mainLightIntensityLumens = args.lightEstimation.mainLightIntensityLumens;
+         //     m_Light.intensity = args.lightEstimation.averageMainLightBrightness.Value;
+         // }
+         //
+         // if (args.lightEstimation.ambientSphericalHarmonics.HasValue)
+         // {
+         //     sphericalHarmonics = args.lightEstimation.ambientSphericalHarmonics;
+         //     RenderSettings.ambientMode = AmbientMode.Skybox;
+         //     RenderSettings.ambientProbe = sphericalHarmonics.Value;
+         // }
     }
 
     Light m_Light;

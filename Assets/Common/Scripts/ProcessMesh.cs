@@ -19,13 +19,13 @@ public class ProcessMesh : MonoBehaviour
       m_renderer = GetComponent<MeshRenderer>();
    }
 
-   private void Update()
+   private void OnEnable()
    {
-      if (LineRendererDrawing.Instance.pointStack.Count >= 2)
-      {
-         MakeMeshData();
-         CreateMesh();
-      }
+        if (LineRendererDrawing.Instance.pointStack.Count >= 2)
+        {
+            MakeMeshData();
+            CreateMesh();
+        }
    }
 
    void MakeMeshData()
@@ -33,7 +33,10 @@ public class ProcessMesh : MonoBehaviour
       var listPoint = new List<Vector3>();
       foreach (var line in LineRendererDrawing.Instance.pointStack)
       {
-         listPoint.Add(line.point.transform.position);
+         if(line.PointType == pointType.Wall)
+         {
+            listPoint.Add(line.point.transform.position);
+         }
       }
       m_vertices = new Vector3[]{};
       m_vertices = listPoint.ToArray();
@@ -46,21 +49,18 @@ public class ProcessMesh : MonoBehaviour
 
       m_tringles = tringlesPoint.ToArray();
       // Use the triangulator to get indices for creating triangles
-       Triangulator tr = new Triangulator(m_tringles);
-       indices = tr.Triangulate();
+      Triangulator tr = new Triangulator(m_tringles);
+      indices = tr.Triangulate();
    }
 
    void CreateMesh()
    {
       m_mesh.Clear();
       m_mesh.vertices = m_vertices;
-
       m_mesh.triangles = indices;
       // Debug.Log("m_tringles count  " + m_tringles.Length);
-
       m_mesh.RecalculateNormals();
       m_mesh.RecalculateBounds();
-
    }
 
    public void ScaleSize()
@@ -70,7 +70,7 @@ public class ProcessMesh : MonoBehaviour
    }
    public void ScaleSizeDown()
    {
-       scale = scale * 0.5f - 1;
+      scale = scale * 0.5f - 1;
       // float scaleY = scale * 0.5f - 1;
       m_renderer.material.SetTextureScale("ThreeMat",new Vector2(scale, scale));
    }
