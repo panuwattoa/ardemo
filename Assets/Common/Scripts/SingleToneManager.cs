@@ -16,8 +16,8 @@ namespace JoystickLab
             {
                 if (instance == null)
                 {
-                    instance = value;
-                    DontDestroyOnLoad(instance.gameObject);
+                    instance = value; 
+                   // DontDestroyOnLoad(instance.gameObject);
                 }
                 else if (instance != value)
                 {

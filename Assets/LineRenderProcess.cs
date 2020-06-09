@@ -73,7 +73,7 @@ public class LineRenderProcess : MonoBehaviour
 
     public void OnClickBack()
     {
-        Destroy(GameObject.Find("exportModels"));
+        DestroyImmediate(GameObject.Find("exportModels"));
         SceneManager.LoadScene("UXManagerScene");
         // LineRendererDrawing.Instance.OnClearAllData();
     }

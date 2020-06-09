@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - lineRender
+  - point
+  - Dot
+  - line
+  - material
   layers:
   - Default
   - TransparentFX

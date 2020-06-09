@@ -15,6 +15,15 @@ public class LightEstimation : MonoBehaviour
     [Tooltip("The ARCameraManager which will produce frame events containing light estimation information.")]
     ARCameraManager m_CameraManager;
 
+    [SerializeField]
+    Transform m_Arrow;
+
+    public Transform arrow
+    {
+        get => m_Arrow;
+        set => m_Arrow = value;
+    }
+
     /// <summary>
     /// Get or set the <c>ARCameraManager</c>.
     /// </summary>
@@ -71,9 +80,6 @@ public class LightEstimation : MonoBehaviour
     /// </summary>
     public SphericalHarmonicsL2? sphericalHarmonics { get; private set; }
 
-    [SerializeField]
-    float m_BrightnessMod = 2.0f;
-
     void Awake ()
     {
         m_Light = GetComponent<Light>();
@@ -83,12 +89,30 @@ public class LightEstimation : MonoBehaviour
     {
         if (m_CameraManager != null)
             m_CameraManager.frameReceived += FrameChanged;
+
+        // Disable the arrow to start; enable it later if we get directional light info
+        if (arrow)
+        {
+            arrow.gameObject.SetActive(false);
+        }
+        Application.onBeforeRender += OnBeforeRender;
     }
 
     void OnDisable()
     {
+        Application.onBeforeRender -= OnBeforeRender;
+
         if (m_CameraManager != null)
             m_CameraManager.frameReceived -= FrameChanged;
+    }
+
+    void OnBeforeRender()
+    {
+        if (arrow && m_CameraManager)
+        {
+            var cameraTransform = m_CameraManager.GetComponent<Camera>().transform;
+            arrow.position = cameraTransform.position + cameraTransform.forward * .25f;
+        }
     }
 
     void FrameChanged(ARCameraFrameEventArgs args)
@@ -96,7 +120,7 @@ public class LightEstimation : MonoBehaviour
         if (args.lightEstimation.averageBrightness.HasValue)
         {
             brightness = args.lightEstimation.averageBrightness.Value;
-            m_Light.intensity = brightness.Value * m_BrightnessMod;
+            m_Light.intensity = brightness.Value;
         }
 
         if (args.lightEstimation.averageColorTemperature.HasValue)
@@ -104,37 +128,46 @@ public class LightEstimation : MonoBehaviour
             colorTemperature = args.lightEstimation.averageColorTemperature.Value;
             m_Light.colorTemperature = colorTemperature.Value;
         }
-        
+
         if (args.lightEstimation.colorCorrection.HasValue)
         {
             colorCorrection = args.lightEstimation.colorCorrection.Value;
             m_Light.color = colorCorrection.Value;
         }
 
-        if (args.lightEstimation.mainLightDirection.HasValue)
-        {
-            mainLightDirection = args.lightEstimation.mainLightDirection;
-            m_Light.transform.rotation = Quaternion.LookRotation(mainLightDirection.Value);
-        }
-
-        if (args.lightEstimation.mainLightColor.HasValue)
-        {
-            mainLightColor = args.lightEstimation.mainLightColor;
-            m_Light.color = mainLightColor.Value;
-        }
-
-        if (args.lightEstimation.mainLightIntensityLumens.HasValue)
-        {
-            mainLightIntensityLumens = args.lightEstimation.mainLightIntensityLumens;
-            m_Light.intensity = args.lightEstimation.averageMainLightBrightness.Value;
-        }
-
-        if (args.lightEstimation.ambientSphericalHarmonics.HasValue)
-        {
-            sphericalHarmonics = args.lightEstimation.ambientSphericalHarmonics;
-            RenderSettings.ambientMode = AmbientMode.Skybox;
-            RenderSettings.ambientProbe = sphericalHarmonics.Value;
-        }
+         // if (args.lightEstimation.mainLightDirection.HasValue)
+         // {
+         //     mainLightDirection = args.lightEstimation.mainLightDirection;
+         //     m_Light.transform.rotation = Quaternion.LookRotation(mainLightDirection.Value);
+         //     if (arrow)
+         //     {
+         //         arrow.gameObject.SetActive(true);
+         //         arrow.rotation = Quaternion.LookRotation(mainLightDirection.Value);
+         //     }
+         // }
+         // else
+         // {
+         //     arrow?.gameObject.SetActive(false);
+         // }
+         //
+         // if (args.lightEstimation.mainLightColor.HasValue)
+         // {
+         //     mainLightColor = args.lightEstimation.mainLightColor;
+         //     m_Light.color = mainLightColor.Value;
+         // }
+         //
+         // if (args.lightEstimation.mainLightIntensityLumens.HasValue)
+         // {
+         //     mainLightIntensityLumens = args.lightEstimation.mainLightIntensityLumens;
+         //     m_Light.intensity = args.lightEstimation.averageMainLightBrightness.Value;
+         // }
+         //
+         // if (args.lightEstimation.ambientSphericalHarmonics.HasValue)
+         // {
+         //     sphericalHarmonics = args.lightEstimation.ambientSphericalHarmonics;
+         //     RenderSettings.ambientMode = AmbientMode.Skybox;
+         //     RenderSettings.ambientProbe = sphericalHarmonics.Value;
+         // }
     }
 
     Light m_Light;
